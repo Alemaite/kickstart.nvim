@@ -90,6 +90,23 @@ files from its distribution, and every one of them crosses the WSL boundary.
 
     cp -r "/mnt/c/Users/<user>/build tools/gradle-8.10.1" ~/tools/
 
+Turning the wrapper off is only half of it. `nvim-lspconfig` ships
+`init_options = {}`, so anything under `settings` reaches jdtls as a
+`workspace/didChangeConfiguration` notification - which arrives *after* the
+project import has already begun, with defaults. `java.import.*` must therefore
+go out in `initializationOptions` as well, the way vscode-java sends it. The
+config builds one `java_settings` table and passes it both ways.
+
+The "Could not load Gradle version information / Cannot download published
+Gradle versions" warning appears on every air-gapped start. It is Buildship
+fetching a list of downloadable Gradle releases for a version picker, and it
+blocks nothing - do not chase it.
+
 After changing any of this, wipe the jdtls workspace so it re-imports:
 
     rm -rf ~/.cache/nvim/jdtls
+
+Eclipse keeps the real import errors in its own log, which is far more useful
+than nvim's when something goes wrong:
+
+    ~/.cache/nvim/jdtls/workspace/<project>/.metadata/.log
