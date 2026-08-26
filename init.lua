@@ -720,6 +720,13 @@ do
     gradle_import.home = gradle_home
   end
 
+  local java_settings = {
+    java = {
+      configuration = { updateBuildConfiguration = 'automatic' },
+      import = { gradle = gradle_import },
+    },
+  }
+
   local servers = {
     -- clangd = {},
     -- gopls = {},
@@ -766,7 +773,14 @@ do
       },
     },
 
-    jdtls = { settings = { java = { import = { gradle = gradle_import } } } },
+    jdtls = {
+      -- jdtls reads java.import.* while importing the project, which happens
+      -- right after initialize - before workspace/didChangeConfiguration
+      -- arrives. vscode-java passes them in initializationOptions, so send
+      -- them both ways or the first import ignores them.
+      init_options = { settings = java_settings },
+      settings = java_settings,
+    },
     lemminx = {}, -- XML: pom.xml and Liquibase changelogs
 
     -- Angular / TypeScript
