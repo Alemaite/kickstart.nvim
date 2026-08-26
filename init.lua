@@ -757,6 +757,32 @@ do
     },
 
     jdtls = {},
+    lemminx = {}, -- XML: pom.xml and Liquibase changelogs
+
+    -- Angular / TypeScript
+    vtsls = {},
+    html = {},
+    cssls = {},
+
+    -- Config files, of which JHipster generates many
+    yamlls = {},
+    jsonls = {},
+    dockerls = {},
+
+    -- Angular 9 needs the 2020-era server, which Mason cannot install
+    -- correctly: npm resolves its caret ranges to modern vscode-jsonrpc
+    -- and the server crashes on startup. ~/lsp/angular-ls pins them.
+    angularls = {
+      cmd = {
+        'node',
+        vim.fn.expand '~/lsp/angular-ls/node_modules/@angular/language-server/index.js',
+        '--stdio',
+        '--tsProbeLocations',
+        vim.fn.expand '~/lsp/angular-ls/node_modules',
+        '--ngProbeLocations',
+        vim.fn.expand '~/lsp/angular-ls/node_modules',
+      },
+    },
   }
 
   vim.pack.add {
@@ -781,9 +807,12 @@ do
   --    :Mason
   --
   -- You can press `g?` for help in this menu.
-  local ensure_installed = vim.tbl_keys(servers or {})
+  -- angularls lives in ~/lsp/angular-ls, so keep Mason from chasing it.
+  local ensure_installed = vim.tbl_filter(function(name) return name ~= 'angularls' end, vim.tbl_keys(servers or {}))
   vim.list_extend(ensure_installed, {
-    -- You can add other tools here that you want Mason to install
+    'prettierd',
+    'java-debug-adapter',
+    'java-test',
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -820,12 +849,14 @@ do
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
-      -- rust = { 'rustfmt' },
-      -- Conform can also run multiple formatters sequentially
-      -- python = { "isort", "black" },
-      --
-      -- You can use 'stop_after_first' to run the first available formatter from the list
-      -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      -- JHipster ships a .prettierrc; match it so diffs stay clean.
+      typescript = { 'prettierd', 'prettier', stop_after_first = true },
+      javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      html = { 'prettierd', 'prettier', stop_after_first = true },
+      css = { 'prettierd', 'prettier', stop_after_first = true },
+      scss = { 'prettierd', 'prettier', stop_after_first = true },
+      json = { 'prettierd', 'prettier', stop_after_first = true },
+      yaml = { 'prettierd', 'prettier', stop_after_first = true },
     },
   }
 
