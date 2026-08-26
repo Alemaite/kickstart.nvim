@@ -710,6 +710,16 @@ do
   --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
+  -- Buildship, jdtls's Gradle integration, defaults to the project's Gradle
+  -- wrapper, which downloads its distribution on first use. An air-gapped
+  -- machine cannot do that, so prefer a local Gradle install when one exists.
+  local gradle_import = { offline = { enabled = true } }
+  local gradle_home = vim.env.GRADLE_HOME or vim.fn.expand '~/tools/gradle-8.10.1'
+  if vim.fn.isdirectory(gradle_home) == 1 then
+    gradle_import.wrapper = { enabled = false }
+    gradle_import.home = gradle_home
+  end
+
   local servers = {
     -- clangd = {},
     -- gopls = {},
@@ -756,7 +766,7 @@ do
       },
     },
 
-    jdtls = {},
+    jdtls = { settings = { java = { import = { gradle = gradle_import } } } },
     lemminx = {}, -- XML: pom.xml and Liquibase changelogs
 
     -- Angular / TypeScript

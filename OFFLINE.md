@@ -69,3 +69,27 @@ explicit `cmd`, and filters it out of Mason's `ensure_installed`.
 Angular templates are filetype `htmlangular`, whose treesitter parser is named
 `angular`. Its highlight query inherits from `html_tags`, so both must be
 present or templates render unhighlighted.
+
+## Java: jdtls and Gradle
+
+jdtls resolves a Gradle project's classpath through Buildship, which by default
+runs the project's Gradle **wrapper**. The wrapper downloads its distribution on
+first use, so on an air-gapped machine the import never finishes: jdtls attaches
+and answers within a single file, but every cross-file lookup returns nothing.
+The symptom in `~/.local/state/nvim/lsp.log` is
+
+    Could not load Gradle version information
+    Cannot download published Gradle versions
+
+followed by no import ever completing.
+
+`init.lua` therefore turns the wrapper off and points Buildship at a local
+Gradle install, taken from `$GRADLE_HOME` or `~/tools/gradle-8.10.1`. Keep that
+install on the Linux filesystem, not under `/mnt/c` - Gradle reads thousands of
+files from its distribution, and every one of them crosses the WSL boundary.
+
+    cp -r "/mnt/c/Users/<user>/build tools/gradle-8.10.1" ~/tools/
+
+After changing any of this, wipe the jdtls workspace so it re-imports:
+
+    rm -rf ~/.cache/nvim/jdtls
