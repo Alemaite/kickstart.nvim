@@ -964,7 +964,7 @@ do
   local parsers = {
     'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
     -- Angular frontend
-    'typescript', 'javascript', 'css', 'scss', 'json',
+    'typescript', 'javascript', 'css', 'scss', 'json', 'angular',
     -- Spring Boot backend and its build/config files
     'java', 'groovy', 'xml', 'yaml', 'sql', 'dockerfile', 'properties',
   }
