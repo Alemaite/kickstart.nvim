@@ -834,7 +834,6 @@ do
   -- angularls lives in ~/lsp/angular-ls, so keep Mason from chasing it.
   local ensure_installed = vim.tbl_filter(function(name) return name ~= 'angularls' end, vim.tbl_keys(servers or {}))
   vim.list_extend(ensure_installed, {
-    'prettierd',
     'java-debug-adapter',
     'java-test',
   })
@@ -855,7 +854,7 @@ do
   -- [[ Formatting ]]
   vim.pack.add { gh 'stevearc/conform.nvim' }
   require('conform').setup {
-    notify_on_error = false,
+    notify_on_error = true,
     format_on_save = function(bufnr)
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
@@ -874,13 +873,35 @@ do
     -- You can also specify external formatters in here.
     formatters_by_ft = {
       -- JHipster ships a .prettierrc; match it so diffs stay clean.
-      typescript = { 'prettierd', 'prettier', stop_after_first = true },
-      javascript = { 'prettierd', 'prettier', stop_after_first = true },
-      html = { 'prettierd', 'prettier', stop_after_first = true },
-      css = { 'prettierd', 'prettier', stop_after_first = true },
-      scss = { 'prettierd', 'prettier', stop_after_first = true },
-      json = { 'prettierd', 'prettier', stop_after_first = true },
-      yaml = { 'prettierd', 'prettier', stop_after_first = true },
+      typescript = { 'prettier' },
+      javascript = { 'prettier' },
+      html = { 'prettier' },
+      css = { 'prettier' },
+      scss = { 'prettier' },
+      json = { 'prettier' },
+      yaml = { 'prettier' },
+      java = { 'prettier' },
+    },
+    formatters = {
+      -- JHipster's root .prettierrc loads prettier-plugin-java and
+      -- prettier-plugin-packagejson, which only exist in the repo-root
+      -- node_modules (see the "prettier:format" script in the root
+      -- package.json). Conform's default resolution walks up from the file and
+      -- would find the nested Angular app's prettier 2.0.5 first, which cannot
+      -- load those plugins and fails on every buffer. Pin both the binary and
+      -- the working directory to the directory holding .prettierrc so the
+      -- editor formats exactly like `npm run prettier:format`.
+      prettier = {
+        cwd = require('conform.util').root_file { '.prettierrc' },
+        command = function(_, ctx)
+          local root = vim.fs.root(ctx.dirname, '.prettierrc')
+          local bin = root and root .. '/node_modules/.bin/prettier'
+          if bin and vim.uv.fs_stat(bin) then
+            return bin
+          end
+          return 'prettier'
+        end,
+      },
     },
   }
 
