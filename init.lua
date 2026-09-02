@@ -1012,6 +1012,8 @@ do
     'typescript', 'javascript', 'css', 'scss', 'json', 'angular',
     -- Spring Boot backend and its build/config files
     'java', 'groovy', 'xml', 'yaml', 'sql', 'dockerfile', 'properties',
+    -- Buffers Neogit and git itself open: commit messages, rebase todos, config
+    'gitcommit', 'git_rebase', 'gitignore', 'gitattributes', 'git_config',
   }
   require('nvim-treesitter').install(parsers)
 
