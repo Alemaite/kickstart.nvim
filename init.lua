@@ -1014,6 +1014,13 @@ do
     'java', 'groovy', 'xml', 'yaml', 'sql', 'dockerfile', 'properties',
     -- Buffers Neogit and git itself open: commit messages, rebase todos, config
     'gitcommit', 'git_rebase', 'gitignore', 'gitattributes', 'git_config',
+    -- Liquibase fake-data lives in src/main/resources/**/fake-data/*.csv
+    'csv', 'tsv', 'psv',
+    -- Injected into other parsers rather than opened directly, so a missing
+    -- one degrades highlighting silently instead of erroring.
+    'regex', 'jsdoc', 'comment',
+    -- Odds and ends that turn up in any repo
+    'toml', 'ini', 'make', 'ssh_config', 'tsx',
   }
   require('nvim-treesitter').install(parsers)
 
