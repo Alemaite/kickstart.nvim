@@ -191,6 +191,24 @@ do
   -- File Tree Keymap
   vim.keymap.set('n', '<leader>e', function() require('mini.files').open(vim.api.nvim_buf_get_name(0)) end, { desc = 'File explorer' })
 
+  -- Yank the current file's path to the system clipboard
+  local function yank_path(modifier, label)
+    return function()
+      local path = vim.fn.expand('%:' .. modifier)
+      if path == '' then
+        vim.notify('Buffer has no file name', vim.log.levels.WARN)
+        return
+      end
+      vim.fn.setreg('+', path)
+      vim.notify(label .. ': ' .. path)
+    end
+  end
+
+  vim.keymap.set('n', '<leader>yp', yank_path('p', 'Full path'), { desc = 'Yank full [P]ath' })
+  vim.keymap.set('n', '<leader>yr', yank_path('.', 'Relative path'), { desc = 'Yank [R]elative path' })
+  vim.keymap.set('n', '<leader>yn', yank_path('t', 'File name'), { desc = 'Yank file [N]ame' })
+  vim.keymap.set('n', '<leader>yd', yank_path('p:h', 'Directory'), { desc = 'Yank [D]irectory' })
+
   -- Diagnostic Config & Keymaps
   --  See `:help vim.diagnostic.Opts`
   vim.diagnostic.config {
@@ -388,6 +406,7 @@ do
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
+      { '<leader>y', group = '[Y]ank path' },
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
   }
