@@ -513,11 +513,14 @@ do
     -- You can put your default mappings / updates / etc. in here
     --  All the info you're looking for is in `:help telescope.setup()`
     --
-    -- defaults = {
-    --   mappings = {
-    --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-    --   },
-    -- },
+    defaults = {
+      -- Java packages make paths long enough that the filename falls off the
+      -- right edge. Put the name first and dim the directory behind it.
+      path_display = { 'filename_first' },
+      -- mappings = {
+      --   i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+      -- },
+    },
     pickers = {
       -- Dotfiles are real files here: .gitlab-ci.yml, .prettierrc, .editorconfig.
       -- fd skips .git on its own, but ripgrep needs to be told.
