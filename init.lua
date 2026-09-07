@@ -518,7 +518,13 @@ do
     --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
     --   },
     -- },
-    -- pickers = {}
+    pickers = {
+      -- Dotfiles are real files here: .gitlab-ci.yml, .prettierrc, .editorconfig.
+      -- fd skips .git on its own, but ripgrep needs to be told.
+      find_files = { hidden = true },
+      live_grep = { additional_args = { '--hidden', '--glob=!.git/' } },
+      grep_string = { additional_args = { '--hidden', '--glob=!.git/' } },
+    },
     extensions = {
       ['ui-select'] = { require('telescope.themes').get_dropdown() },
     },
