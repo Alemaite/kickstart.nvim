@@ -806,7 +806,13 @@ do
       -- right after initialize - before workspace/didChangeConfiguration
       -- arrives. vscode-java passes them in initializationOptions, so send
       -- them both ways or the first import ignores them.
-      init_options = { settings = java_settings },
+      -- classFileContentsSupport tells jdtls we can read a jdt:// buffer.
+      -- Without it, go-to-definition on a class that lives inside a jar
+      -- returns an empty result and the jump silently does nothing.
+      init_options = {
+        extendedClientCapabilities = { classFileContentsSupport = true },
+        settings = java_settings,
+      },
       settings = java_settings,
     },
     lemminx = {}, -- XML: pom.xml and Liquibase changelogs
@@ -872,6 +878,24 @@ do
     vim.lsp.config(name, server)
     vim.lsp.enable(name)
   end
+
+  -- A class inside a jar has no path on disk, so jdtls points at it with a
+  -- jdt:// URI. Nothing in Neovim or nvim-lspconfig knows that scheme, so the
+  -- jump lands in an empty buffer. Ask jdtls for the source text instead.
+  vim.api.nvim_create_autocmd('BufReadCmd', {
+    pattern = 'jdt://*',
+    callback = function(ev)
+      local client = vim.lsp.get_clients({ name = 'jdtls' })[1]
+      if not client then return end
+      local res = client:request_sync('java/classFileContents', { uri = ev.match }, 30000)
+      if not (res and res.result) then return end
+      vim.bo[ev.buf].modifiable = true
+      vim.api.nvim_buf_set_lines(ev.buf, 0, -1, false, vim.split(res.result, '\n'))
+      vim.bo[ev.buf].filetype = 'java'
+      vim.bo[ev.buf].modifiable = false
+      vim.bo[ev.buf].buftype = 'nofile'
+    end,
+  })
 end
 
 -- ============================================================
