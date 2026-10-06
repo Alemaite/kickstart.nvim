@@ -275,6 +275,22 @@ do
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
   })
+
+  -- Liquibase changelogs include each other with paths that start at the
+  -- classpath root rather than at the including file, so gf on
+  -- <include file="config/liquibase/..."> finds nothing with the default
+  -- 'path' of `.,,`.
+  vim.api.nvim_create_autocmd('FileType', {
+    desc = 'Let gf follow classpath-relative paths in XML',
+    group = vim.api.nvim_create_augroup('xml-resource-path', { clear = true }),
+    pattern = 'xml',
+    callback = function(ev)
+      local root = vim.fs.root(ev.buf, { 'build.gradle', 'pom.xml', '.git' })
+      if not root then return end
+      local resources = root .. '/src/main/resources'
+      if vim.uv.fs_stat(resources) then vim.opt_local.path:append(resources) end
+    end,
+  })
 end
 
 -- ============================================================
