@@ -483,6 +483,11 @@ do
   -- - sr)'  - [S]urround [R]eplace [)] [']
   require('mini.surround').setup()
 
+  -- Close brackets and quotes as you type them: { gives {}, and typing the
+  -- closing one just steps over it. Ships inside mini.nvim, so nothing new has
+  -- to be carried to the offline machine.
+  require('mini.pairs').setup()
+
   -- File Tree Plugin
   require('mini.files').setup()
 
