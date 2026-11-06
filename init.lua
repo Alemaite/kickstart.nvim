@@ -439,6 +439,14 @@ do
     styles = {
       comments = { italic = false }, -- Disable italics in comments
     },
+    -- The default gutter colour is 1.7:1 against the background, too faint to
+    -- read. dark5 is 4.1:1: readable, and still quieter than the code itself.
+    -- relativenumber draws the other lines with LineNrAbove/Below, so set all three.
+    on_highlights = function(hl, c)
+      hl.LineNr = { fg = c.dark5 }
+      hl.LineNrAbove = { fg = c.dark5 }
+      hl.LineNrBelow = { fg = c.dark5 }
+    end,
   }
 
   -- Load the colorscheme here.
